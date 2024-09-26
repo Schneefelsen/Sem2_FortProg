@@ -1,0 +1,13 @@
+name,average_runtime,implementation_complexity,average_worldwide_usage,internet_fame
+Linear Search,2,1,7,6
+Binary Search,9,3,9,8
+Jump Search,5,4,3,3
+Exponential Search,7,5,4,4
+Interpolation Search,6,5,3,3
+Fibonacci Search,6,6,3,4
+Ternary Search,5,4,4,3
+Binary Search Tree,8,7,6,5
+Bidirectional Search,7,5,4,4
+Jump Point Search,6,6,3,3
+Genetic Algorithm Search,6,7,4,6
+Simulated Annealing,5,6,4,6

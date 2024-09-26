@@ -1,0 +1,23 @@
+name,average_runtime,implementation_complexity,average_worldwide_usage,internet_fame
+Bubble Sort,2,1,5,7
+Insertion Sort,4,2,6,6
+Selection Sort,3,3,5,5
+Merge Sort,9,6,8,8
+Quick Sort,8,5,9,9
+Heap Sort,7,6,7,7
+Counting Sort,8,5,5,6
+Radix Sort,7,6,4,5
+Bucket Sort,6,5,4,4
+Shell Sort,6,5,5,5
+Cocktail Shaker Sort,3,3,3,4
+Gnome Sort,2,1,2,3
+Pancake Sort,2,2,1,4
+Bogo Sort,0,0,1,10
+Comb Sort,5,3,3,4
+Tim Sort,9,7,8,6
+Sleep Sort,0,0,0,6
+Stooge Sort,0,1,1,5
+Bitonic Sort,4,4,2,3
+Odd-Even Sort,5,3,2,3
+Pigeonhole Sort,6,4,3,4
+Smooth Sort,6,5,3,3
