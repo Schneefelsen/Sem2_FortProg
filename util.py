@@ -29,7 +29,6 @@ def name_to_function_dict():
         "Heap Sort": "heap_sort",
         "Counting Sort": "counting_sort",
         "Radix Sort": "radix_sort",
-        "Bucket Sort": "bucket_sort",
         "Shell Sort": "shell_sort",
         "Cocktail Shaker Sort": "cocktail_shaker_sort",
         "Gnome Sort": "gnome_sort",
@@ -51,7 +50,6 @@ def bubble_sort(problem: list) -> list:
         for i in range(len(problem)-1):
             if problem[i] > problem[i+1]:
                 problem[i], problem[i+1] = problem[i+1], problem[i]
-    # is mutating
 
 
 def insertion_sort(problem: list) -> list:
@@ -62,19 +60,17 @@ def insertion_sort(problem: list) -> list:
             problem[j+1] = problem[j]
             j = j - 1
         problem[j+1] = comparitor
-    # is mutating
 
 
 def selection_sort(problem: list) -> list:
-    selector = 0
-    for _ in range(len(problem) - 1):
-        min_num, min_index = problem[selector], selector
-        for i in range(selector + 1, len(problem) - 1):
-            if problem[i] < min_num:
-                min_num, min_index = problem[i], i
-            problem.insert(selector, problem.pop(min_index))
-        selector += 1
-    # is mutating
+    n = len(problem)
+    for selector in range(n):
+        min_index = selector
+        for i in range(selector + 1, n):
+            if problem[i] < problem[min_index]:
+                min_index = i
+        # Swap the found minimum element with the first element
+        problem[selector], problem[min_index] = problem[min_index], problem[selector]
 
 
 def merge_sort(problem: list) -> list:
@@ -95,21 +91,28 @@ def merge_sort(problem: list) -> list:
     problem = sorted_problem
 
 
-def quick_sort(problem, left, right):
-    def find_divider(problem, left, right):
-        pivot = problem[right]
-        i = left - 1
-        for j in range(left, right):
-            if problem[j] <= pivot:
+def quick_sort(problem):
+    def partition(low, high):
+        pivot = problem[high]  # Choose the last element as the pivot
+        i = low - 1  # Pointer for the smaller element
+        for j in range(low, high):
+            if problem[j] < pivot:
                 i += 1
-            problem[i], problem[j] = problem[j], problem[i]
-        problem[i + 1], problem[right] = problem[right], problem[i + 1]
+                problem[i], problem[j] = problem[j], problem[i]  # Swap elements
+        problem[i + 1], problem[high] = problem[high], problem[i + 1]  # Place pivot in the correct position
         return i + 1
-    if left < right:
-        divider = find_divider(problem, left, right)
-        quick_sort(left, divider - 1)
-        quick_sort(divider + 1, right)
-    # is mutating
+
+    def quick_sort_recursive(low, high):
+        while low < high:
+            pivot_index = partition(low, high)
+            if pivot_index - low < high - pivot_index:
+                quick_sort_recursive(low, pivot_index - 1)
+                low = pivot_index + 1
+            else:
+                quick_sort_recursive(pivot_index + 1, high)
+                high = pivot_index - 1
+
+    quick_sort_recursive(0, len(problem) - 1)
 
 
 def heap_sort(problem):
@@ -130,69 +133,61 @@ def heap_sort(problem):
     for i in range(n - 1, 0, -1):
         (problem[i], problem[0]) = (problem[0], problem[i])  # swap
         heapify(problem, i, 0)
-    # is mutating
 
 
 def counting_sort(problem):
     max_el = max(problem)
     counter = [0 for _ in range(max_el + 1)]
+    # Count occurrences of each element
     for el in problem:
         counter[el] += 1
-    for i in range(1, max_el+1):
-        counter[i] += counter[i-1]
-    solution = []
+    # Compute the prefix sums
+    for i in range(1, max_el + 1):
+        counter[i] += counter[i - 1]
+    # Initialize the solution list with the same length as the problem
+    solution = [0] * len(problem)
+    # Place the elements in their sorted positions (iterating from right to left for stability)
     for el in problem[::-1]:
-        solution[counter[el]-1] = el
+        solution[counter[el] - 1] = el
         counter[el] -= 1
-    problem = solution
-
+    # Copy the sorted solution back into the problem list
+    for i in range(len(problem)):
+        problem[i] = solution[i]
 
 def radix_sort(problem):
-    max_el = max(problem)
-    digit = 1
+    max_el = max(problem)  # Find the maximum element to know the number of digits
+    digit = 1  # Start with the least significant digit
     while max_el // digit > 0:
         size = len(problem)
-        solution = [0] * size
-        count = [0] * 10
+        solution = [0] * size  # Temporary array to store sorted numbers based on current digit
+        count = [0] * 10  # There are 10 possible digits (0-9)
+        # Count the occurrences of digits at the current place value
         for i in range(size):
             index = problem[i] // digit
             count[index % 10] += 1
-        for i in range(10):
-            count[i] += count[i-1]
+        # Compute the cumulative count (prefix sum)
+        for i in range(1, 10):
+            count[i] += count[i - 1]
+        # Build the solution array (sorted by current digit), moving right to left for stability
         i = size - 1
-        while i >= 1:
+        while i >= 0:
             index = problem[i] // digit
             solution[count[index % 10] - 1] = problem[i]
             count[index % 10] -= 1
             i -= 1
+        # Copy the solution array to the original list (problem)
         for i in range(size):
             problem[i] = solution[i]
+        # Move to the next more significant digit
         digit *= 10
-    problem = solution
 
-
-def bucket_sort(problem):
-    n = len(problem)
-    buckets = [[] for _ in range(n)]
-    # Put array elements in different buckets
-    for num in problem:
-        bi = int(n * num)
-        buckets[bi].append(num)
-    # Sort individual buckets using insertion sort
-    for bucket in buckets:
-        insertion_sort(bucket)
-    # Concatenate all buckets into problem
-    index = 0
-    for bucket in buckets:
-        for num in bucket:
-            problem[index] = num
-            index += 1
-    # is mutating
 
 def shell_sort(problem):
     n = len(problem)
-    gap = n // 2
+    gap = n // 2  # Use integer division for the gap
+    # Continue reducing the gap and sorting the subarrays
     while gap > 0:
+        # Perform insertion sort with the given gap
         for i in range(gap, n):
             ordered_val = problem[i]
             j = i
@@ -200,8 +195,7 @@ def shell_sort(problem):
                 problem[j] = problem[j - gap]
                 j -= gap
             problem[j] = ordered_val
-        gap /= 2
-    # is mutating
+        gap //= 2  # Reduce the gap using integer division
 
 
 def cocktail_shaker_sort(problem):
@@ -217,7 +211,6 @@ def cocktail_shaker_sort(problem):
                 is_swapped = True
         if not is_swapped:
             break
-    # is mutating
 
 
 def gnome_sort(problem):
@@ -230,7 +223,6 @@ def gnome_sort(problem):
         else:
             problem[index], problem[index - 1] = problem[index - 1], problem[index]
             index = index - 1
-    # is mutating
 
 
 def pancake_sort(problem):
@@ -240,7 +232,6 @@ def pancake_sort(problem):
         problem = problem[mi::-1] + problem[mi + 1:len(problem)]
         problem = problem[arr_len - 1::-1] + problem[arr_len:len(problem)]
         arr_len -= 1
-    # is mutating
 
 
 def bogo_sort(problem):
@@ -251,10 +242,8 @@ def bogo_sort(problem):
             if problem[i] > problem[i + 1]:
                 return False
         return True
-
     while not is_sorted(problem):
         rd.shuffle(problem)
-    # is mutating
 
 
 def comb_sort(problem):
@@ -271,7 +260,6 @@ def comb_sort(problem):
                 problem[i], problem[i + gaps] = problem[i + gaps], problem[i]
                 swapped = True
             i += 1
-    # is mutating
 
 
 def tim_sort(problem):
@@ -324,13 +312,12 @@ def tim_sort(problem):
             if mid < right:
                 merge(problem, left, mid, right)
         size = 2 * size
-    # is mutating
 
 
 def sleep_sort(problem):
     def sleep_and_print(n, max_value):
         time.sleep(n * 0.001)  # Scale sleep time down to 1% of the number value
-        print(n, end=' ')
+        # print(n, end=' ') <- this would be the returned array, but that's not really pretty for the display
     if not problem:
         return
     max_value = max(problem)
@@ -341,27 +328,25 @@ def sleep_sort(problem):
         threads.append(thread)
     for thread in threads:
         thread.join()
-    # is mutating
 
 
 def stooge_sort(problem):
     def stooge(arr, i, h):
         if i >= h:
             return
-        # If first element is smaller than the last then swap them
+        # If first element is larger than the last, swap them
         if arr[i] > arr[h]:
             arr[i], arr[h] = arr[h], arr[i]
-        # If there are more than 2 elements in the array
+        # If there are more than 2 elements in the subarray
         if h - i + 1 > 2:
-            t = (int)((h - i + 1) / 3)
-            # Recursively sort first 2/3 elements
-            stooge(arr, i, (h - t))
-            # Recursively sort last 2/3 elements
-            stooge(arr, i + t, (h))
-            # Recursively sort first 2/3 elements
-            stooge(arr, i, (h - t))
-    stooge(problem, 0, len(problem) - 1)
-    # is mutating
+            t = (h - i + 1) // 3  # Compute one-third of the current segment length
+            # Recursively sort the first 2/3 of the array
+            stooge(arr, i, h - t)
+            # Recursively sort the last 2/3 of the array
+            stooge(arr, i + t, h)
+            # Recursively sort the first 2/3 of the array again
+            stooge(arr, i, h - t)
+    stooge(problem, 0, len(problem) - 1)  # Call stooge on the entire array
 
 
 def bitonic_sort(problem):
@@ -398,7 +383,6 @@ def odd_even_sort(problem):
             if problem[i] > problem[i + 1]:
                 problem[i], problem[i + 1] = problem[i + 1], problem[i]
                 is_sorted = 0
-    # is mutating
 
 
 def pigeonhole_sort(problem):
@@ -414,7 +398,6 @@ def pigeonhole_sort(problem):
             holes[count] -= 1
             problem[i] = count + my_min
             i += 1
-    # is mutating
 
 
 def smooth_sort(problem):
@@ -465,7 +448,6 @@ def smooth_sort(problem):
         while j > 0 and problem[j] < problem[j - 1]:
             problem[j], problem[j - 1] = problem[j - 1], problem[j]
             j = j - 1
-    # is mutating
 
 
 
@@ -533,19 +515,28 @@ def exponential_search(problem, target):
 
 def interpolation_search(problem, target):
     def inter_search(problem, lo, hi, target):
+        # Check if target is within bounds
         if lo <= hi and problem[lo] <= target <= problem[hi]:
-            pos = lo + ((hi - lo) // (problem[hi] - problem[lo]) *
-                        (target - problem[lo]))
+            # Avoid division by zero
+            if problem[hi] == problem[lo]:
+                if problem[lo] == target:
+                    return lo
+                return -1
+            # Calculate the position
+            pos = lo + ((hi - lo) // (problem[hi] - problem[lo]) * (target - problem[lo]))          
+            # Check if target is found
             if problem[pos] == target:
                 return pos
+            # If target is larger, search in the right subarray
             if problem[pos] < target:
-                return interpolation_search(problem, pos + 1, hi, target)
-            if problem[pos] > target:
-                return interpolation_search(problem, lo, pos - 1, target)
-        return -1
+                return inter_search(problem, pos + 1, hi, target)
+            # If target is smaller, search in the left subarray
+            return inter_search(problem, lo, pos - 1, target)      
+        return -1  # Target is not found
     lo = 0
     hi = len(problem) - 1
-    inter_search(problem, lo, hi, target)
+    return inter_search(problem, lo, hi, target)  # Return the result
+
 
 
 def fibonacci_search(problem, target):
@@ -578,21 +569,22 @@ def fibonacci_search(problem, target):
 
 def ternary_search(problem, target):
     def search(l, r, ar, key):
-        if (r >= l):
+        if r >= l:
             mid1 = l + (r - l) // 3
             mid2 = r - (r - l) // 3
-            if (ar[mid1] == key):
+            if ar[mid1] == key:
                 return mid1
-            if (ar[mid2] == key):
+            if ar[mid2] == key:
                 return mid2
-            if (key < ar[mid1]):
-                return search(l, mid1 - 1, key, ar)
-            elif (key > ar[mid2]):
-                return search(mid2 + 1, r, key, ar)
+            if key < ar[mid1]:
+                return search(l, mid1 - 1, ar, key)
+            elif key > ar[mid2]:
+                return search(mid2 + 1, r, ar, key)
             else:
-                return search(mid1 + 1, mid2 - 1, key, ar)
+                return search(mid1 + 1, mid2 - 1, ar, key)
         return -1
-    search(0, len(problem)-1, problem, target)
+    
+    return search(0, len(problem) - 1, problem, target)
 
 def binary_search_tree(problem, target):
     class TreeNode:
