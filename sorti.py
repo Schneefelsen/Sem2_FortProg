@@ -33,12 +33,12 @@ class StatCard:
         """Displays the stat card in a formatted way."""
         space = 30
         print(f"+{'-' * (space)}+")
-        print(f"|{self.name.center(space)}|")
+        print(f"|{('*' *len(self.name)).center(space)}|")
         print(f"|{' ' * (space)}|")
-        print(f"| Runtime: {('★' * self.runtime + '☆' * (10 - self.runtime)).rjust(space - 13)}|")
-        print(f"| Complexity: {('★' * self.complexity + '☆' * (10 - self.complexity)).rjust(space - 16)}|")
-        print(f"| Usage: {('★' * self.usage + '☆' * (10 - self.usage)).rjust(space - 11)}|")
-        print(f"| Fame: {('★' * self.fame + '☆' * (10 - self.fame)).rjust(space - 10)}|")
+        print(f"| Runtime: {('★' * self.runtime + '☆' * (10 - self.runtime)).rjust(space - 10)}|")
+        print(f"| Complexity: {('★' * self.complexity + '☆' * (10 - self.complexity)).rjust(space - 13)}|")
+        print(f"| Usage: {('★' * self.usage + '☆' * (10 - self.usage)).rjust(space - 8)}|")
+        print(f"| Fame: {('★' * self.fame + '☆' * (10 - self.fame)).rjust(space - 7)}|")
         print(f"+{'-' * (space)}+")
 
 
